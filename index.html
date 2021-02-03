@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <style>
+        .chat__message {
+            width: 80%;
+            padding: 13px;
+            background-color: #eee;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            float: right;
+        }
+        .me {
+            float: left;
+        }
+
+        td {
+            width: 35px;
+            height: 35px;
+            background-color: #eee;
+            text-align: center;
+            line-height: 35px;
+        }
+
+        td:hover {
+            cursor: pointer;
+        }
+    </style>
+    <title>ChatIo</title>
+</head>
+<body>
+    <span>
+        <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+            <h5 class="my-0 mr-md-auto font-weight-normal">Chat.Io</h5>
+            <nav class="my-2 my-md-0 mr-md-3">
+              <a class="p-2 text-dark" href="#">Главная</a>
+              <a class="p-2 text-dark" href="#">Про нас</a>
+              <a class="p-2 text-dark" href="#">Поддержка</a>
+              <a class="p-2 text-dark" href="#">Цены</a>
+            </nav>
+            <a class="btn btn-outline-primary" href="#">Регистрация</a>
+        </div>
+    
+        <div class="container">
+            <div class="py-5text-center">
+                <h2>Чат программа</h2>
+                <p class="lead">Укажите имя и начинайте переписку</p>
+                <input type="text" id="author" placeholder="Укажите имя" class="form-control col-4">
+                <br />
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h3>Форма сообщений</h3>
+                    <form id="messForm">
+                        <label for="message">Сообщение</label>
+                        <textarea name="message" id="message" class="form-control" placeholder="Введите сообщение"></textarea>
+                        <br />
+                        <input type="button" value="Отправить" id="send" class="btn btn-danger">
+                    </form>
+                </div>
+                <div class="col-6">
+                    <h3>Сообщения</h3>
+                    <div id="all_mess"></div>
+                </div>
+            </div>
+        </div>
+    </span>
+    
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<script>
+
+    const printChat = data => {
+        let div = document.createElement( 'div' );
+            div.classList.add( 'chat__message' );
+            if( data.author === author.value ){
+                div.classList.add( 'me' );
+            }
+            div.innerHTML = `
+                <b>${data.author}</b>
+                <br/ >
+                ${data.msg}
+            `;
+        all_mess.appendChild( div );
+        all_mess.appendChild( document.createElement( 'br' ) );
+    }
+
+    // server
+    const socket = io.connect();
+
+    // get previus chat
+    socket.on( 'con', data => {
+        data.forEach( item => {
+            printChat( item );
+        });
+    });
+
+    const form = document.getElementById( 'messForm' );
+    const textarea = document.getElementById( 'message' );
+    const all_mess = document.getElementById( 'all_mess' );
+    const author = document.getElementById( 'author' );
+    
+    document.getElementById( 'send' ).addEventListener( 'click', e =>{
+        if( textarea.value !== '' && author.value !== '' ){
+            let client = {
+                author: author.value,
+                mess: textarea.value
+            }
+            socket.emit( 'send_mess', client );
+            textarea.value = '';
+        }
+    });
+
+    socket.on( 'add_mess', data => {
+        printChat( data );
+    });
+</script>
+</html>
