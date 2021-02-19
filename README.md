@@ -1,2 +1,18 @@
-# ChatIo
-To run, enter `node index.js` into the terminal and go to `http://127.0.0.1:8080`
+# Chat
+
+(socket.io, nodejs (express)
+
+## Project setup
+```
+npm install
+```
+
+For build client run
+```
+npm run cli
+```
+
+For run server run
+```
+node index.js
+```
